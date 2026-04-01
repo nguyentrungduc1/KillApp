@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <!-- Floating KILL bubble -->
+    <LinearLayout
+        android:id="@+id/floatKillBtn"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_float_button"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:elevation="8dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⚡"
+            android:textSize="22sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="KILL"
+            android:textColor="@color/bg_dark"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1" />
+    </LinearLayout>
+
+    <!-- Progress indicator (shown during kill) -->
+    <LinearLayout
+        android:id="@+id/floatProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_card"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="10dp"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"
+        android:elevation="8dp"
+        android:minWidth="100dp">
+
+        <ProgressBar
+            android:id="@+id/floatProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="80dp"
+            android:layout_height="4dp"
+            android:progressDrawable="@drawable/progress_bar"
+            android:max="100" />
+
+        <TextView
+            android:id="@+id/floatProgressText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0%"
+            android:textColor="@color/cyan_primary"
+            android:textSize="11sp"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KillApp</string>
+    <string name="accessibility_service_label">KillApp Cleaner Service</string>
+    <string name="accessibility_description">KillApp sử dụng Accessibility Service để tự động xóa cache và kill ứng dụng thông qua Settings</string>
+    <string name="tab_main">Dọn dẹp</string>
+    <string name="tab_exclude">Loại trừ</string>
+    <string name="btn_kill_all">KILL &amp; CLEAN</string>
+    <string name="enable_accessibility">Bật Accessibility Service</string>
+    <string name="enable_overlay">Bật Overlay Permission</string>
+    <string name="processing">Đang xử lý…</string>
+    <string name="done">Hoàn tất!</string>
+    <string name="apps_found">ứng dụng</string>
+    <string name="exclude_hint">Thêm ứng dụng vào danh sách loại trừ</string>
+    <string name="notification_channel_name">KillApp Service</string>
+    <string name="notification_channel_desc">Dịch vụ dọn dẹp nền KillApp</string>
+    <string name="notification_title">KillApp đang chạy</string>
+    <string name="notification_text">Nhấn để mở ứng dụng</string>
+    <string name="floating_kill">KILL</string>
+    <string name="select_all">Chọn tất cả</string>
+    <string name="deselect_all">Bỏ chọn</string>
+    <string name="search_hint">Tìm ứng dụng…</string>
+    <string name="widget_label">KillApp</string>
+    <string name="widget_description">Nhấn để Kill &amp; Clean tất cả ứng dụng</string>
+</resources>

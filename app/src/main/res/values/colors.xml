@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_dark">#0D1117</color>
+    <color name="bg_card">#161B22</color>
+    <color name="bg_surface">#21262D</color>
+    <color name="cyan_primary">#00F5FF</color>
+    <color name="magenta_primary">#FF00FF</color>
+    <color name="purple_accent">#7B68EE</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#8B949E</color>
+    <color name="text_disabled">#484F58</color>
+    <color name="success">#3FB950</color>
+    <color name="warning">#D29922</color>
+    <color name="error">#F85149</color>
+    <color name="divider">#30363D</color>
+    <color name="overlay_kill">#CC0D1117</color>
+    <color name="btn_gradient_start">#00F5FF</color>
+    <color name="btn_gradient_end">#FF00FF</color>
+    <color name="tab_selected">#00F5FF</color>
+    <color name="tab_unselected">#8B949E</color>
+    <color name="bg_card_inner">#2A2A3E</color>
+</resources>
