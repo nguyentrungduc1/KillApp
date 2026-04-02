@@ -15,6 +15,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -50,6 +51,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
     private lateinit var tvProgressLabel: TextView
 
+    // 3 switches
+    private lateinit var switchForceStop: Switch
+    private lateinit var switchClearCache: Switch
+    private lateinit var switchClearRecents: Switch
+
     private var progressStep = 0
     private var totalSteps = 0
 
@@ -82,6 +88,7 @@ class MainActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         bindViews()
+        loadSwitchStates()   // đọc giá trị đã lưu → set switch UI
         setupPager()
         setupClickListeners()
         observeViewModel()
@@ -91,7 +98,8 @@ class MainActivity : AppCompatActivity() {
             RECEIVER_NOT_EXPORTED)
 
         if (intent.getBooleanExtra("trigger_kill", false)) {
-            btnKillAll.postDelayed({ startKillAll() }, 800)
+            // FIX 3: delay đủ lớn để danh sách app load xong trước khi kill
+            btnKillAll.postDelayed({ startKillAll() }, 2500)
         }
     }
 
@@ -103,19 +111,29 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindViews() {
-        cardAccessibility = findViewById(R.id.cardAccessibility)
-        cardOverlay = findViewById(R.id.cardOverlay)
-        layoutPermissions = findViewById(R.id.layoutPermissions)
-        tvTotalApps = findViewById(R.id.tvTotalApps)
-        tvExcluded = findViewById(R.id.tvExcluded)
-        tvLastCleaned = findViewById(R.id.tvLastCleaned)
-        tabLayout = findViewById(R.id.tabLayout)
-        viewPager = findViewById(R.id.viewPager)
-        btnKillAll = findViewById(R.id.btnKillAll)
-        btnToggleFloat = findViewById(R.id.btnToggleFloat)
-        layoutProgress = findViewById(R.id.layoutProgress)
-        progressBar = findViewById(R.id.progressBar)
-        tvProgressLabel = findViewById(R.id.tvProgressLabel)
+        cardAccessibility   = findViewById(R.id.cardAccessibility)
+        cardOverlay         = findViewById(R.id.cardOverlay)
+        layoutPermissions   = findViewById(R.id.layoutPermissions)
+        tvTotalApps         = findViewById(R.id.tvTotalApps)
+        tvExcluded          = findViewById(R.id.tvExcluded)
+        tvLastCleaned       = findViewById(R.id.tvLastCleaned)
+        tabLayout           = findViewById(R.id.tabLayout)
+        viewPager           = findViewById(R.id.viewPager)
+        btnKillAll          = findViewById(R.id.btnKillAll)
+        btnToggleFloat      = findViewById(R.id.btnToggleFloat)
+        layoutProgress      = findViewById(R.id.layoutProgress)
+        progressBar         = findViewById(R.id.progressBar)
+        tvProgressLabel     = findViewById(R.id.tvProgressLabel)
+        switchForceStop     = findViewById(R.id.switchForceStop)
+        switchClearCache    = findViewById(R.id.switchClearCache)
+        switchClearRecents  = findViewById(R.id.switchClearRecents)
+    }
+
+    /** Đọc từ PrefsManager → hiển thị đúng trạng thái switch khi mở app */
+    private fun loadSwitchStates() {
+        switchForceStop.isChecked    = PrefsManager.getDoForceStop(this)
+        switchClearCache.isChecked   = PrefsManager.getDoClearCache(this)
+        switchClearRecents.isChecked = PrefsManager.getDoClearRecents(this)
     }
 
     private fun setupPager() {
@@ -135,6 +153,17 @@ class MainActivity : AppCompatActivity() {
         cardOverlay.setOnClickListener { openOverlaySettings() }
         btnKillAll.setOnClickListener { startKillAll() }
         btnToggleFloat.setOnClickListener { toggleFloatingBubble() }
+
+        // Lưu ngay khi user toggle switch
+        switchForceStop.setOnCheckedChangeListener { _, checked ->
+            PrefsManager.setDoForceStop(this, checked)
+        }
+        switchClearCache.setOnCheckedChangeListener { _, checked ->
+            PrefsManager.setDoClearCache(this, checked)
+        }
+        switchClearRecents.setOnCheckedChangeListener { _, checked ->
+            PrefsManager.setDoClearRecents(this, checked)
+        }
     }
 
     private fun observeViewModel() {
@@ -149,7 +178,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val toKill = viewModel.getSelectedApps()
+        val toKill   = viewModel.getSelectedApps()
         val cacheOnly = viewModel.getExcludedAppsForCacheClean()
 
         if (toKill.isEmpty() && cacheOnly.isEmpty()) {
@@ -158,7 +187,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val doClearRecents = PrefsManager.getDoClearRecents(this)
-        totalSteps = toKill.size + cacheOnly.size + (if (doClearRecents) 1 else 0)
+        totalSteps  = toKill.size + cacheOnly.size + (if (doClearRecents) 1 else 0)
         progressStep = 0
         progressBar.progress = 0
         tvProgressLabel.text = "Đang bắt đầu…"
@@ -170,8 +199,8 @@ class MainActivity : AppCompatActivity() {
     private fun setProcessing(processing: Boolean) {
         layoutProgress.visibility = if (processing) View.VISIBLE else View.GONE
         btnKillAll.isEnabled = !processing
-        btnKillAll.alpha = if (processing) 0.5f else 1.0f
-        btnKillAll.text = if (processing) "⏳ ĐANG XỬ LÝ…" else "⚡  KILL & CLEAN ALL"
+        btnKillAll.alpha     = if (processing) 0.5f else 1.0f
+        btnKillAll.text      = if (processing) "⏳ ĐANG XỬ LÝ…" else "⚡  KILL & CLEAN ALL"
     }
 
     private fun toggleFloatingBubble() {
@@ -191,10 +220,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
-        val a11yOk = isAccessibilityEnabled()
+        val a11yOk    = isAccessibilityEnabled()
         val overlayOk = Settings.canDrawOverlays(this)
-        cardAccessibility.visibility = if (a11yOk) View.GONE else View.VISIBLE
-        cardOverlay.visibility = if (overlayOk) View.GONE else View.VISIBLE
+        cardAccessibility.visibility = if (a11yOk)    View.GONE else View.VISIBLE
+        cardOverlay.visibility       = if (overlayOk) View.GONE else View.VISIBLE
         layoutPermissions.visibility = if (a11yOk && overlayOk) View.GONE else View.VISIBLE
         if (PrefsManager.isFloatEnabled(this))
             btnToggleFloat.setColorFilter(getColor(R.color.cyan_primary))
@@ -220,7 +249,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun updateStats() {
         tvTotalApps.text = viewModel.getTotalCount().toString()
-        tvExcluded.text = viewModel.getExcludedCount().toString()
+        tvExcluded.text  = viewModel.getExcludedCount().toString()
     }
 
     private fun updateLastClean() {
@@ -232,7 +261,7 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         if (intent?.getBooleanExtra("trigger_kill", false) == true)
-            btnKillAll.postDelayed({ startKillAll() }, 800)
+            btnKillAll.postDelayed({ startKillAll() }, 2500)
     }
 
     override fun onDestroy() {

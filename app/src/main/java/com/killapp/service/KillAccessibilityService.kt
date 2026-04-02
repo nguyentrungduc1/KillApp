@@ -144,10 +144,15 @@ class KillAccessibilityService : AccessibilityService() {
     }
 
     // ─── Clear Cache ─────────────────────────────────────────────────────────
-    // FIX 1: Samsung One UI 6+ dùng RecyclerView — text node không clickable trực tiếp.
-    //        Cần tìm clickable ancestor. Sau khi click, đợi màn hình Storage load hẳn.
+    // FIX 1: Samsung One UI 6+ — text node không clickable, cần leo lên ancestor
+    // FIX 2: Scroll xuống cuối màn hình App Info trước khi tìm "Lưu trữ"
+    //        (Samsung One UI 6 ẩn mục Storage ở cuối danh sách, không tự cuộn)
 
     private suspend fun doClearCache() {
+        // FIX 2: Scroll xuống cuối màn hình App Info để "Lưu trữ" lộ ra
+        scrollToBottomInSettings()
+        delay(400)
+
         // Tìm mục "Lưu trữ" và leo lên clickable ancestor nếu cần
         val storageNode = pollForClickableNode(
             texts = listOf(
@@ -185,7 +190,7 @@ class KillAccessibilityService : AccessibilityService() {
             requireEnabled = true
         )
 
-        // Nếu không thấy, thử scroll xuống rồi tìm lại (Samsung đôi khi nút ở cuối)
+        // Nếu không thấy, scroll xuống thêm lần nữa rồi tìm lại
         if (clearCacheNode == null) {
             val root = rootInActiveWindow
             findScrollable(root ?: return)?.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
@@ -211,6 +216,25 @@ class KillAccessibilityService : AccessibilityService() {
 
         performGlobalAction(GLOBAL_ACTION_BACK)
         delay(600)
+    }
+
+    /**
+     * FIX 2: Scroll xuống cuối màn hình Settings hiện tại (App Info).
+     * Samsung One UI 6 không tự cuộn — mục "Lưu trữ" nằm cuối RecyclerView.
+     * Thực hiện tối đa 5 lần scroll forward để đảm bảo đến cuối.
+     */
+    private suspend fun scrollToBottomInSettings() {
+        repeat(5) {
+            val root = rootInActiveWindow ?: return
+            val scrollable = findScrollable(root)
+            if (scrollable != null) {
+                val scrolled = scrollable.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD)
+                if (!scrolled) return   // đã đến cuối, thoát sớm
+                delay(250)
+            } else {
+                return
+            }
+        }
     }
 
     // ─── Clear Recent Tasks ──────────────────────────────────────────────────
