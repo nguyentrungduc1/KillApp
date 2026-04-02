@@ -1,88 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Popup tiến trình — hiện tự động khi kill đang chạy, ẩn khi xong -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/floatRoot"
-    android:layout_width="220dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/bg_popup"
-    android:elevation="12dp"
-    android:clipToOutline="true">
+    android:gravity="center">
 
-    <!-- Thanh tiến trình full-width trên cùng -->
-    <ProgressBar
-        android:id="@+id/floatProgressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:progressDrawable="@drawable/progress_bar"
-        android:max="100"
-        android:progress="0" />
-
-    <!-- Nội dung popup -->
+    <!-- Floating KILL bubble -->
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/floatKillBtn"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/bg_float_button"
+        android:gravity="center"
         android:orientation="vertical"
-        android:paddingHorizontal="14dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="12dp">
+        android:elevation="8dp"
+        android:clickable="true"
+        android:focusable="true">
 
-        <!-- Tên bước hiện tại: "Xoá cache" / "Buộc dừng" / "Đóng Recents" -->
         <TextView
-            android:id="@+id/floatStepName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Đang xử lý…"
-            android:textColor="@color/text_primary"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:text="⚡"
+            android:textSize="22sp" />
 
-        <!-- Dòng phụ: "#N, chờ…" -->
         <TextView
-            android:id="@+id/floatStepSub"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text=""
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp"
-            android:layout_marginTop="2dp" />
-
-        <!-- Divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/divider"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="6dp" />
-
-        <!-- Counter + tên app: "31 / 48   Android Auto" -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                android:id="@+id/floatCounter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0 / 0"
-                android:textColor="@color/cyan_primary"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/floatAppName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text=""
-                android:textColor="@color/text_primary"
-                android:textSize="12sp"
-                android:maxLines="1"
-                android:ellipsize="end" />
-        </LinearLayout>
+            android:text="KILL"
+            android:textColor="@color/bg_dark"
+            android:textSize="9sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1" />
     </LinearLayout>
+
+    <!-- Progress indicator (shown during kill) -->
+    <LinearLayout
+        android:id="@+id/floatProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_card"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="10dp"
+        android:layout_marginTop="4dp"
+        android:visibility="gone"
+        android:elevation="8dp"
+        android:minWidth="100dp">
+
+        <ProgressBar
+            android:id="@+id/floatProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="80dp"
+            android:layout_height="4dp"
+            android:progressDrawable="@drawable/progress_bar"
+            android:max="100" />
+
+        <TextView
+            android:id="@+id/floatProgressText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0%"
+            android:textColor="@color/cyan_primary"
+            android:textSize="11sp"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
 </LinearLayout>

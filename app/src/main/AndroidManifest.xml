@@ -69,6 +69,19 @@
             </intent-filter>
         </receiver>
 
+        <!-- Widget 1×1: KILL & CLEAN ALL -->
+        <receiver
+            android:name=".service.KillWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_kill_info" />
+        </receiver>
+
     </application>
 
 </manifest>

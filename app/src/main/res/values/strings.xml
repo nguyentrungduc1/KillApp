@@ -20,4 +20,6 @@
     <string name="select_all">Chọn tất cả</string>
     <string name="deselect_all">Bỏ chọn</string>
     <string name="search_hint">Tìm ứng dụng…</string>
+    <string name="widget_label">KillApp</string>
+    <string name="widget_description">Nhấn để Kill &amp; Clean tất cả ứng dụng</string>
 </resources>
