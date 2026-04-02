@@ -34,17 +34,6 @@
             android:textStyle="bold"
             android:letterSpacing="0.05" />
 
-        <!-- Floating bubble toggle -->
-        <ImageView
-            android:id="@+id/btnToggleFloat"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:src="@android:drawable/ic_menu_compass"
-            android:tint="@color/text_secondary"
-            android:background="@drawable/bg_card"
-            android:padding="6dp"
-            android:clickable="true"
-            android:focusable="true" />
     </LinearLayout>
 
     <!-- Permission warning cards -->
@@ -214,91 +203,6 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
-
-    <!-- Settings card: 3 switches -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingBottom="6dp"
-        android:background="@color/bg_dark">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_card"
-            android:orientation="vertical"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="10dp">
-
-            <!-- Row 1: Force Stop -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="⛔  Buộc dừng ứng dụng"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp" />
-                <Switch
-                    android:id="@+id/switchForceStop"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:thumbTint="@color/cyan_primary"
-                    android:trackTint="@color/bg_card_inner" />
-            </LinearLayout>
-
-            <!-- Row 2: Clear Cache -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="🗑  Xóa bộ nhớ đệm (cache)"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp" />
-                <Switch
-                    android:id="@+id/switchClearCache"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:thumbTint="@color/cyan_primary"
-                    android:trackTint="@color/bg_card_inner" />
-            </LinearLayout>
-
-            <!-- Row 3: Clear Recents -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="36dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="📋  Đóng tất cả tác vụ gần đây"
-                    android:textColor="@color/text_primary"
-                    android:textSize="12sp" />
-                <Switch
-                    android:id="@+id/switchClearRecents"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:thumbTint="@color/cyan_primary"
-                    android:trackTint="@color/bg_card_inner" />
-            </LinearLayout>
-        </LinearLayout>
-    </LinearLayout>
 
     <!-- Bottom KILL button -->
     <LinearLayout
