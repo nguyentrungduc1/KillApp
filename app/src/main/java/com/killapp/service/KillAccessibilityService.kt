@@ -18,13 +18,26 @@ class KillAccessibilityService : AccessibilityService() {
     companion object {
         private const val TAG = "KillA11y"
 
-        const val ACTION_STATE = "com.killapp.STATE"
-        const val EXTRA_STATE = "state"
-        const val STATE_READY = "ready"
-        const val STATE_BUSY = "busy"
-        const val STATE_DONE = "done"
-        const val STATE_STEP = "step"
-        const val EXTRA_STEP_MSG = "step_msg"
+        const val ACTION_STATE      = "com.killapp.STATE"
+        const val EXTRA_STATE       = "state"
+        const val STATE_READY       = "ready"
+        const val STATE_BUSY        = "busy"
+        const val STATE_DONE        = "done"
+        const val STATE_STEP        = "step"
+
+        // Cũ — giữ tương thích
+        const val EXTRA_STEP_MSG    = "step_msg"
+
+        // Mới — dành cho popup tiến trình
+        const val EXTRA_STEP_TYPE   = "step_type"   // "force_stop" | "clear_cache" | "recents"
+        const val EXTRA_APP_NAME    = "app_name"    // tên hiển thị app hiện tại
+        const val EXTRA_STEP_INDEX  = "step_index"  // số thứ tự app (1-based)
+        const val EXTRA_STEP_TOTAL  = "step_total"  // tổng số app phải xử lý
+        const val EXTRA_TOTAL_TASKS = "total_tasks" // tổng tasks gửi cùng STATE_BUSY
+
+        const val STEP_TYPE_FORCE_STOP  = "force_stop"
+        const val STEP_TYPE_CLEAR_CACHE = "clear_cache"
+        const val STEP_TYPE_RECENTS     = "recents"
 
         var instance: KillAccessibilityService? = null
     }
@@ -35,6 +48,7 @@ class KillAccessibilityService : AccessibilityService() {
     private val killQueue = ArrayDeque<KillTask>()
     private var isProcessing = false
     private var clearRecentPending = false
+    private var totalApps = 0  // tổng số app, truyền vào từ KillService
 
     override fun onServiceConnected() {
         super.onServiceConnected()
@@ -61,10 +75,11 @@ class KillAccessibilityService : AccessibilityService() {
         clearRecentPending = true
     }
 
-    fun startProcessing() {
+    fun startProcessing(total: Int) {
         if (!isProcessing) {
+            totalApps = total
             isProcessing = true
-            broadcastState(STATE_BUSY)
+            broadcastBusy(total)
             scope.launch { processAll() }
         }
     }
@@ -72,6 +87,9 @@ class KillAccessibilityService : AccessibilityService() {
     // ─── Main sequential loop ────────────────────────────────────────────────
 
     private suspend fun processAll() {
+        var appIndex = 0
+        val snapshotTotal = totalApps
+
         while (killQueue.isNotEmpty()) {
             val task = killQueue.removeFirst()
 
@@ -81,7 +99,31 @@ class KillAccessibilityService : AccessibilityService() {
                 continue
             }
 
-            broadcastStep("Xử lý: ${task.pkg}")
+            appIndex++
+            val appName = resolveAppName(task.pkg)
+
+            // Bước Force Stop
+            if (task.doForceStop) {
+                broadcastStepDetail(
+                    type = STEP_TYPE_FORCE_STOP,
+                    appName = appName,
+                    index = appIndex,
+                    total = snapshotTotal,
+                    msg = "Buộc dừng: $appName"
+                )
+            }
+
+            // Bước Clear Cache (dùng chung appIndex vì vẫn là cùng 1 app)
+            if (task.doClearCache) {
+                broadcastStepDetail(
+                    type = STEP_TYPE_CLEAR_CACHE,
+                    appName = appName,
+                    index = appIndex,
+                    total = snapshotTotal,
+                    msg = "Xoá cache: $appName"
+                )
+            }
+
             processOneApp(task)
             delay(400)
         }
@@ -89,6 +131,13 @@ class KillAccessibilityService : AccessibilityService() {
         if (clearRecentPending) {
             clearRecentPending = false
             delay(600)
+            broadcastStepDetail(
+                type = STEP_TYPE_RECENTS,
+                appName = "",
+                index = snapshotTotal,
+                total = snapshotTotal,
+                msg = "Đóng tất cả tác vụ…"
+            )
             clearRecentTasks()
         }
 
@@ -394,12 +443,36 @@ class KillAccessibilityService : AccessibilityService() {
         })
     }
 
-    private fun broadcastStep(msg: String) {
+    private fun broadcastBusy(total: Int) {
         sendBroadcast(Intent(ACTION_STATE).apply {
-            putExtra(EXTRA_STATE, STATE_STEP)
-            putExtra(EXTRA_STEP_MSG, msg)
+            putExtra(EXTRA_STATE, STATE_BUSY)
+            putExtra(EXTRA_TOTAL_TASKS, total)
             `package` = packageName
         })
+    }
+
+    private fun broadcastStepDetail(
+        type: String, appName: String, index: Int, total: Int, msg: String
+    ) {
+        sendBroadcast(Intent(ACTION_STATE).apply {
+            putExtra(EXTRA_STATE, STATE_STEP)
+            putExtra(EXTRA_STEP_MSG, msg)       // tương thích cũ
+            putExtra(EXTRA_STEP_TYPE, type)
+            putExtra(EXTRA_APP_NAME, appName)
+            putExtra(EXTRA_STEP_INDEX, index)
+            putExtra(EXTRA_STEP_TOTAL, total)
+            `package` = packageName
+        })
+    }
+
+    private fun resolveAppName(pkg: String): String {
+        return try {
+            val pm = packageManager
+            val ai = pm.getApplicationInfo(pkg, 0)
+            pm.getApplicationLabel(ai).toString()
+        } catch (e: Exception) {
+            pkg.substringAfterLast('.')
+        }
     }
 
     override fun onInterrupt() {}

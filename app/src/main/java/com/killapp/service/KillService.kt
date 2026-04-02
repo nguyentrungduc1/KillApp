@@ -79,28 +79,23 @@ class KillService : Service() {
 
         updateNotification("Xếp hàng ${toKillPkgs.size + cacheOnlyPkgs.size} ứng dụng…")
 
-        // FIX 2: Đọc tùy chọn từ PrefsManager (được lưu từ màn hình Settings)
         val doForceStop = PrefsManager.getDoForceStop(this)
         val doClearCache = PrefsManager.getDoClearCache(this)
         val doClearRecents = PrefsManager.getDoClearRecents(this)
+        val totalApps = toKillPkgs.size + cacheOnlyPkgs.size
 
-        // Enqueue kill + cache clear
         for (pkg in toKillPkgs) {
             a11y.enqueueKill(pkg, doForceStop = doForceStop, doClearCache = doClearCache)
         }
-
-        // Enqueue cache-only — app loại trừ, KHÔNG force stop dù setting bật
         for (pkg in cacheOnlyPkgs) {
             a11y.enqueueKill(pkg, doForceStop = false, doClearCache = doClearCache)
         }
+        if (doClearRecents) a11y.scheduleClearRecent()
 
-        // Request clear recent at end (FIX 3: dùng nút "Đóng tất cả" thay vuốt)
-        if (doClearRecents) {
-            a11y.scheduleClearRecent()
-        }
+        // Auto-khởi động popup tiến trình (không cần user bật tay)
+        startForegroundService(Intent(this, FloatingOverlayService::class.java))
 
-        // Start processing
-        a11y.startProcessing()
+        a11y.startProcessing(totalApps)
 
         PrefsManager.setLastCleanTime(this, System.currentTimeMillis())
         stopSelf()
